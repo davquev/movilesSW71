@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AppRecyclervSM</string>
+    <string name="nombre">Ingrese nombre</string>
+    <string name="telefono">Ingrese telefono</string>
+</resources>
