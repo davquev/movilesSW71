@@ -11,11 +11,15 @@ import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.prototype_team.view.*
 
-class TeamAdapter(val teams: List<Team>, val context: Context): RecyclerView.Adapter<TeamAdapter.ViewHolder>() {
+class TeamAdapter(val teams: List<Team>, val context: Context, val itemClickListener: OnItemClickListener): RecyclerView.Adapter<TeamAdapter.ViewHolder>() {
     class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
         val ivLogo = view.ivLogo
         val tvName = view.tvName
         val cvTeam = view.cvTeam
+    }
+
+    interface OnItemClickListener {
+        fun onItemClicked(team: Team)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TeamAdapter.ViewHolder {
@@ -37,5 +41,9 @@ class TeamAdapter(val teams: List<Team>, val context: Context): RecyclerView.Ada
         val picBiulder = Picasso.Builder(context)
         picBiulder.downloader(OkHttp3Downloader(context))
         picBiulder.build().load(team.logo).into(holder.ivLogo)
+
+        holder.cvTeam.setOnClickListener {
+            itemClickListener.onItemClicked(team)
+        }
     }
 }
