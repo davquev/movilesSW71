@@ -7,6 +7,7 @@ class PokemonRepository {
   int count = 0;
 
   Future<List<Results>> fetchPokemons() async {
+    //solo entra la 1ra vez
     if (this.pokemons.isEmpty) {
       this.pokemons.addAll(await apiProvider.fetchPokemons());
       this.count = this.pokemons.length;
