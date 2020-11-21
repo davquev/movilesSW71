@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutterappmymovie/models/movie.dart';
+import 'package:flutterappmymovie/utils/db_helper.dart';
 import 'package:flutterappmymovie/utils/http_helper.dart';
 
 class MovieList extends StatefulWidget {
@@ -37,16 +39,64 @@ class _MovieListState extends State<MovieList> {
       body: ListView.builder(
         itemCount: movies.length,
         itemBuilder: (BuildContext context, int index){
-          return Card(
-            color: Colors.white,
-            elevation: 2.0,
-            child: ListTile(
-              title: Text(movies[index].title),
-              subtitle: Text(movies[index].overview),
-            ),
-          );
+          return MovieRow(movies[index]);
         },
       ),
     );
+  }
+}
+
+class MovieRow extends StatefulWidget {
+  final Movie movie;
+  MovieRow(this.movie);
+
+  @override
+  _MovieRowState createState() => _MovieRowState(movie);
+}
+
+class _MovieRowState extends State<MovieRow> {
+  final Movie movie;
+  _MovieRowState(this.movie);
+
+  bool favorite;
+  DbHelper dbHelper;
+
+  @override
+  void initState(){
+    favorite = false;
+    dbHelper = DbHelper();
+    isFavorite(movie);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.white,
+      elevation: 2.0,
+      child: ListTile(
+        title: Text(widget.movie.title),
+        subtitle: Text(widget.movie.overview),
+        trailing: IconButton(
+          icon: Icon(Icons.favorite),
+          color: favorite ? Colors.red : Colors.grey,
+          onPressed: (){
+            favorite ? dbHelper.deleteMovie(movie) : dbHelper.insertMovie(movie);
+            setState(() {
+              favorite = !favorite;
+              movie.isFavorite = favorite;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Future isFavorite(Movie movie) async{
+    await dbHelper.openDB();
+    favorite = await dbHelper.isFavorite(movie);
+    setState(() {
+      movie.isFavorite = favorite;
+    });
   }
 }

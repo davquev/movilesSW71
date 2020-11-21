@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterappdepelicula/models/movie.dart';
+import 'package:flutterappdepelicula/util/db_helper.dart';
 import 'package:flutterappdepelicula/util/http_helper.dart';
 
 class MovieList extends StatefulWidget {
@@ -58,10 +59,13 @@ class _MovieRowState extends State<MovieRow> {
   _MovieRowState(this.movie);
 
   bool favorite;
+  DbHelper dbHelper;
 
   @override
   void initState(){
     favorite = false;
+    dbHelper = DbHelper();
+    isFavorite(movie);
     super.initState();
   }
 
@@ -77,12 +81,22 @@ class _MovieRowState extends State<MovieRow> {
           icon: Icon(Icons.favorite),
           color: favorite ? Colors.red : Colors.grey,
           onPressed: (){
+            favorite ? dbHelper.deleteMovie(movie) : dbHelper.insertMovie(movie);
             setState(() {
               favorite = !favorite;
+              movie.isFavorite = favorite;
             });
           },
         ),
       ),
     );
+  }
+
+  Future isFavorite(Movie movie) async {
+    await dbHelper.openDb();
+    favorite = await dbHelper.isFavorite(movie);
+    setState(() {
+      movie.isFavorite = favorite;
+    });
   }
 }

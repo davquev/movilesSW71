@@ -1,3 +1,5 @@
+import 'dart:core';
+
 class Movie {
   double popularity;
   String posterPath;
@@ -5,6 +7,7 @@ class Movie {
   String title;
   String overview;
   String releaseDate;
+  bool isFavorite;
 
   Movie(
       {this.popularity,
@@ -12,15 +15,17 @@ class Movie {
         this.id,
         this.title,
         this.overview,
-        this.releaseDate});
+        this.releaseDate,
+      this.isFavorite});
 
   Movie.fromJson(Map<String, dynamic> json) {
-    popularity = json['popularity'];
+    popularity = json['popularity'].toDouble();
     posterPath = json['poster_path'];
     id = json['id'];
     title = json['title'];
     overview = json['overview'];
     releaseDate = json['release_date'];
+    isFavorite = json['isFavorite'];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,5 +37,12 @@ class Movie {
     data['overview'] = this.overview;
     data['release_date'] = this.releaseDate;
     return data;
+  }
+
+  Map<String, dynamic> toMap(){
+    return{
+      'id': id,
+      'title': title,
+    };
   }
 }

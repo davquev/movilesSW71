@@ -5,6 +5,7 @@ class Movie {
   String title;
   String overview;
   String releaseDate;
+  bool isFavorite;
 
   Movie(
       {this.popularity,
@@ -12,7 +13,8 @@ class Movie {
         this.id,
         this.title,
         this.overview,
-        this.releaseDate});
+        this.releaseDate,
+        this.isFavorite});
 
   Movie.fromJson(Map<String, dynamic> json) {
     popularity = json['popularity'];
@@ -21,6 +23,7 @@ class Movie {
     title = json['title'];
     overview = json['overview'];
     releaseDate = json['release_date'];
+    isFavorite = json['isFavorite'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +34,14 @@ class Movie {
     data['title'] = this.title;
     data['overview'] = this.overview;
     data['release_date'] = this.releaseDate;
+    data['isFavorite'] = this.isFavorite;
     return data;
+  }
+
+  Map<String, dynamic> toMap(){
+    return{
+      'id': id,
+      'title': title,
+    };
   }
 }
