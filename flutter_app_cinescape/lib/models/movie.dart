@@ -1,5 +1,3 @@
-import 'dart:core';
-
 class Movie {
   double popularity;
   String posterPath;

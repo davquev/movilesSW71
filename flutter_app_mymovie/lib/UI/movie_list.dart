@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterappmymovie/models/movie.dart';
 import 'package:flutterappmymovie/utils/db_helper.dart';
 import 'package:flutterappmymovie/utils/http_helper.dart';
+import 'package:flutterappmymovie/UI/movie_detail.dart';
 
 class MovieList extends StatefulWidget {
   @override
@@ -11,16 +12,16 @@ class MovieList extends StatefulWidget {
 class _MovieListState extends State<MovieList> {
   List movies;
   int moviesCount;
+  int page = 1;
+  bool loading = true;
+  ScrollController _scrollController;
 
   HttpHelper helper;
 
   Future initialize() async {
-    movies = List();
-    movies = await helper.getUpcoming();
-    setState(() {
-      moviesCount = movies.length;
-      movies = movies;
-    });
+    movies = List<Movie>();
+    loadMore();
+    initScrollController();
   }
 
   @override
@@ -37,12 +38,40 @@ class _MovieListState extends State<MovieList> {
         title: Text('My movies!!!'),
       ),
       body: ListView.builder(
+        controller: _scrollController,
         itemCount: movies.length,
         itemBuilder: (BuildContext context, int index){
           return MovieRow(movies[index]);
         },
       ),
     );
+  }
+
+  void loadMore() {
+    helper.getUpcoming(page.toString()).then((value){
+      movies += value;
+      setState(() {
+        moviesCount = movies.length;
+        movies = movies;
+        page++;
+      });
+      print(movies.length % 20);
+
+      if (movies.length % 20 > 0){
+
+        loading = false;
+      }
+    });
+  }
+
+  void initScrollController() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if ((_scrollController.position.pixels == _scrollController.position.maxScrollExtent) &&
+      loading){
+        loadMore();
+      }
+    });
   }
 }
 
@@ -60,6 +89,7 @@ class _MovieRowState extends State<MovieRow> {
 
   bool favorite;
   DbHelper dbHelper;
+  String path;
 
   @override
   void initState(){
@@ -70,13 +100,42 @@ class _MovieRowState extends State<MovieRow> {
   }
 
   @override
+  void setState(fn){
+    if (mounted){
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (movie.posterPath != null) {
+      path = 'https://image.tmdb.org/t/p/w500/' + movie.posterPath;
+    } else {
+      path =
+      'http://zazsupercentro.com/wp-content/uploads/2017/07/imagen-no-disponible.png';
+    }
+
     return Card(
       color: Colors.white,
       elevation: 2.0,
       child: ListTile(
+        leading: Hero(
+          tag: 'poster_' + widget.movie.id.toString(),
+          child: Image.network(path),
+        ),
         title: Text(widget.movie.title),
-        subtitle: Text(widget.movie.overview),
+        subtitle: Text('Lanzamiento: '+widget.movie.releaseDate + '\n' +
+        'Votacion: '+widget.movie.popularity.toString()),
+        onTap: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => MovieDetail(widget.movie)
+            ),
+          ).then((value){
+            isFavorite(movie);
+          });
+        },
         trailing: IconButton(
           icon: Icon(Icons.favorite),
           color: favorite ? Colors.red : Colors.grey,

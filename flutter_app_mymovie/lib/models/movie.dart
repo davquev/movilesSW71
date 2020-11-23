@@ -17,7 +17,7 @@ class Movie {
         this.isFavorite});
 
   Movie.fromJson(Map<String, dynamic> json) {
-    popularity = json['popularity'];
+    popularity = json['popularity'].toDouble();
     posterPath = json['poster_path'];
     id = json['id'];
     title = json['title'];
